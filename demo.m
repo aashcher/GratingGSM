@@ -85,14 +85,21 @@ SMbsup = smatrix_interface(kz1, kz2, gsm_method.eps_b, grating.eps_sup, 'TEM');
 gsm_method.SMsubb = SMsubb;
 gsm_method.SMbsup = SMbsup;
 
-	% 2D Toeplitz vector for grating permittivity Fourier coefficients:
+	% 2D Toeplitz vector for grating permittivity and normal field Fourier coefficients:
 FM = feps_cyl(gsm_method.no, grating.radius/grating.period(1), grating.radius/grating.period(2), ...
 							grating.center_x, grating.center_y, grating.eps, grating.eps_m, gsm_method.eps_b);
+FN = fnxy_cyl(gsm_method.no(1), gsm_method.no(2), kg(1), kg(2), zeros(1,Ncyl), wavenumber*grating.radius, ...
+							0.25*wavenumber*grating.period(1)*ones(1,Ncyl), grating.center_x, grating.center_y);
 	% convert to circulant matrices and pre-calculate their FFT:
 CM_eps = cell(2,1);
 CM_eps{1} = fft2(circulant2(FM{1}, gsm_method.no(1), gsm_method.no(2)));
 CM_eps{2} = fft2(circulant2(FM{2}, gsm_method.no(1), gsm_method.no(2)));
 gsm_method.CM_eps = CM_eps; % circulant matrix first row
+CM_nxy = cell(3,1);
+CM_nxy{1} = fft2(circulant2(FN{1}, gsm_method.no(1), gsm_method.no(2)));
+CM_nxy{2} = fft2(circulant2(FN{2}, gsm_method.no(1), gsm_method.no(2)));
+CM_nxy{3} = fft2(circulant2(FN{3}, gsm_method.no(1), gsm_method.no(2)));
+gsm_method.CM_nxy = CM_nxy;
 
 	%% test run:
 tic;
